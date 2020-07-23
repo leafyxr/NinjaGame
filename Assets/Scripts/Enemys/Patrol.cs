@@ -49,7 +49,8 @@ public class Patrol : MonoBehaviour
     {
         bool lastDir = isRight;
 
-        ViewCheck();
+        if (state !=  State.Pause)
+            ViewCheck();
 
         switch (state)
         {
@@ -87,7 +88,7 @@ public class Patrol : MonoBehaviour
                     {
                         animator.SetBool("Search", false);
                         Debug.Log("Follow");
-                        target = collider.gameObject.transform.position;
+                        target = collider.ClosestPoint(transform.position);
                         target.y = transform.position.y;
                         following = true;
                         searching = false;
@@ -209,8 +210,10 @@ public class Patrol : MonoBehaviour
     {
         if (pause)
         {
+            Debug.Log("Pause Patrol");
             if (lastState != State.Pause)
             {
+                body.velocity = new Vector2(0, body.velocity.y);
                 lastState = state;
                 state = State.Pause;
                 return true;
@@ -218,6 +221,7 @@ public class Patrol : MonoBehaviour
         }
         else
         {
+            Debug.Log("UnPause Patrol");
             if (lastState != State.Pause)
             {
                 state = lastState;
