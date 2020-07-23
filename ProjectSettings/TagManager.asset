@@ -18,8 +18,8 @@ TagManager:
   - Enemy
   - Object
   - Background
-  - 
-  - 
+  - Enemy Projectile
+  - Player Projectile
   - 
   - 
   - 

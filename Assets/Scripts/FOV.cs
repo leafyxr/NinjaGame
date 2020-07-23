@@ -48,6 +48,8 @@ public class FOV : MonoBehaviour
         circleCollider.offset = Offset;
         circleCollider.isTrigger = true;
         circleCollider.radius = radius;
+
+        detections = new List<Collider2D>();
     }
 
     private void Update()
@@ -88,7 +90,8 @@ public class FOV : MonoBehaviour
     public bool CheckObstruction(Collider2D target)
     {
         RaycastHit2D[] hits = new RaycastHit2D[10];
-        Physics2D.Linecast(transform.position, target.ClosestPoint(transform.position), ObstructionFilter, hits);
+        int i = Physics2D.Linecast(transform.position, target.ClosestPoint(transform.position), ObstructionFilter, hits);
+        if (i == 0) return false;
         foreach (RaycastHit2D hit in hits)
         {
             if (hit.transform.gameObject.GetInstanceID() == target.transform.gameObject.GetInstanceID())

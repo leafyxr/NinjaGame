@@ -38,10 +38,13 @@ public class Gunner : MonoBehaviour
 
         if (isAttacking && targetVisible)
         {
-            if (!this.animator.GetCurrentAnimatorStateInfo(0).IsName("GunnerFire"))
+            if (animator.GetCurrentAnimatorStateInfo(0).IsName("GunnerFire"))
             {
-                Debug.Log("Animation not running");
-                animationEnd();
+                if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.9)
+                {
+                    Debug.Log("Animation End");
+                    animationEnd();
+                }
             }
             clock += Time.deltaTime;
             if (clock >= attackDelay)
@@ -62,8 +65,6 @@ public class Gunner : MonoBehaviour
             isAttacking = false;
             clock = 0.0f;
         }
-        else animationEnd();
-
     }
 
     void ViewCheck()
@@ -93,6 +94,7 @@ public class Gunner : MonoBehaviour
 
     public void Fire()
     {
-
+        GameObject projectile = Instantiate(bulletPrefab, Fireposition.position, Fireposition.rotation);
+        projectile.GetComponent<Projectile>().setTarget(target);
     }
 }

@@ -49,8 +49,7 @@ public class Patrol : MonoBehaviour
     {
         bool lastDir = isRight;
 
-        if (state !=  State.Pause)
-            ViewCheck();
+        ViewCheck();
 
         switch (state)
         {
@@ -67,6 +66,7 @@ public class Patrol : MonoBehaviour
                 Wander();
                 break;
             case State.Pause:
+                body.velocity = new Vector2(0, body.velocity.y);
                 break;
         }
 
@@ -76,6 +76,24 @@ public class Patrol : MonoBehaviour
     void ViewCheck()
     {
         Collider2D[] colliders = GetComponentInChildren<FOV>().getDetections();
+
+        if (state == State.Pause)
+        {
+            foreach (Collider2D collider in colliders)
+            {
+                if (collider.CompareTag("Player"))
+                {
+                    targetVisable = GetComponentInChildren<FOV>().CheckObstruction(collider);
+                    if (targetVisable)
+                    {
+                        target = collider.ClosestPoint(transform.position);
+                        target.y = transform.position.y;
+                        return;
+                    }
+                }
+            }
+            return;
+        }
 
         targetVisable = false;
         if (colliders != null)
@@ -224,7 +242,10 @@ public class Patrol : MonoBehaviour
             Debug.Log("UnPause Patrol");
             if (lastState != State.Pause)
             {
-                state = lastState;
+                state = State.Search;
+                following = true;
+                searching = false;
+                ViewCheck();
                 return true;
             }
         }
