@@ -5,9 +5,10 @@ using UnityEngine;
 
 public class Patrol : MonoBehaviour
 {
-    enum State { Follow, Search, Idle, Wander};
+    enum State { Follow, Search, Idle, Wander, Pause};
     [SerializeField]
     State state;
+    State lastState;
 
     bool following = false;
     bool searching = false;
@@ -64,9 +65,11 @@ public class Patrol : MonoBehaviour
             case State.Wander:
                 Wander();
                 break;
+            case State.Pause:
+                break;
         }
 
-        
+
     }
 
     void ViewCheck()
@@ -79,16 +82,18 @@ public class Patrol : MonoBehaviour
             {
                 if (collider.CompareTag("Player"))
                 {
-                    targetVisable = true;
-                    animator.SetBool("Search", false);
-                    Debug.Log("Follow");
-                    target = collider.gameObject.transform.position;
-                    target.y = transform.position.y;
-                    following = true;
-                    searching = false;
-                    state = State.Follow;
-                    return;
-
+                    targetVisable = GetComponentInChildren<FOV>().CheckObstruction(collider);
+                    if (targetVisable)
+                    {
+                        animator.SetBool("Search", false);
+                        Debug.Log("Follow");
+                        target = collider.gameObject.transform.position;
+                        target.y = transform.position.y;
+                        following = true;
+                        searching = false;
+                        state = State.Follow;
+                        return;
+                    }
                 }
             }
 
@@ -198,5 +203,27 @@ public class Patrol : MonoBehaviour
         GetComponent<SpriteRenderer>().flipX = isRight;
         GameObject obj = GetComponentInChildren<FOV>().gameObject;
         obj.transform.RotateAround(gameObject.transform.position, Vector3.up, 180);
+    }
+
+    public bool pausePatrol(bool pause)
+    {
+        if (pause)
+        {
+            if (lastState != State.Pause)
+            {
+                lastState = state;
+                state = State.Pause;
+                return true;
+            }
+        }
+        else
+        {
+            if (lastState != State.Pause)
+            {
+                state = lastState;
+                return true;
+            }
+        }
+        return false;
     }
 }
