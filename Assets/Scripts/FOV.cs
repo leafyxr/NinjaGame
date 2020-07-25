@@ -89,28 +89,30 @@ public class FOV : MonoBehaviour
 
     public bool CheckObstruction(Collider2D target)
     {
-        RaycastHit2D[] hits = new RaycastHit2D[10];
-        int i = Physics2D.Linecast(transform.position, target.ClosestPoint(transform.position), ObstructionFilter, hits);
+        RaycastHit2D[] hits = new RaycastHit2D[100];
+
+        Vector2 direction = ((Vector2)target.transform.position - (Vector2)transform.position).normalized;
+
+        //int i = Physics2D.Linecast(transform.position, target.ClosestPoint(transform.position), ObstructionFilter, hits);
+
+        int i = Physics2D.Raycast(transform.position, direction, ObstructionFilter, hits);
+
         if (i == 0) return false;
         foreach (RaycastHit2D hit in hits)
         {
-            if (hit.transform.gameObject.GetInstanceID() == target.transform.gameObject.GetInstanceID())
+            if (hit.collider == null)
             {
-                Debug.Log("Hit Success");
+            }
+            else if (hit.transform.gameObject.GetInstanceID() == target.transform.gameObject.GetInstanceID())
+            {
                 Debug.DrawLine(transform.position, hit.point, Color.blue);
-                Debug.Log("Target Visable");
                 return true;
             }
             else if (hit.transform.gameObject.GetInstanceID() != gameObject.GetInstanceID()
                 && hit.transform.gameObject.GetInstanceID() != transform.parent.gameObject.GetInstanceID())
             {
-                Debug.Log("Hit Failure");
                 Debug.DrawLine(transform.position, hit.point, Color.red);
                 return false;
-            }
-            else
-            {
-                Debug.Log("Self Detection, Continue");
             }
         }
         return false;

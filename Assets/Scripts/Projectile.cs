@@ -8,6 +8,8 @@ public class Projectile : MonoBehaviour
     [SerializeField]
     float speed = 5;
 
+    int damage = 1;
+
     [SerializeField]
     ContactFilter2D ContactFilter;
 
@@ -32,6 +34,16 @@ public class Projectile : MonoBehaviour
         if (i==1)
         {
             hit = true;
+
+            if (hits[0].CompareTag("Player") && hits[0].GetComponent<PlayerManager>())
+            {
+                hits[0].GetComponent<PlayerManager>().takeDamage(damage);
+            }
+            else if (hits[0].CompareTag("Enemy") && hits[0].GetComponent<Enemy>())
+            {
+                hits[0].GetComponent<Enemy>().takeDamage(damage);
+            }
+
             Destroy(gameObject);
         }
     }
@@ -39,8 +51,10 @@ public class Projectile : MonoBehaviour
     public void setTarget(Vector2 Target)
     {
         direction = (Target - (Vector2)transform.position).normalized;
-
-        Debug.Log("Direction : " + direction.x + ", " + direction.y);
     }
 
+    public void setDamage(int i)
+    {
+        damage = i;
+    }
 }

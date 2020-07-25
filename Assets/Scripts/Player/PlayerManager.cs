@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class PlayerManager : MonoBehaviour
 {
     [SerializeField]
     Stats stats;
@@ -12,10 +12,6 @@ public class Enemy : MonoBehaviour
     }
 
     void Update()
-    {
-    }
-
-    private void FixedUpdate()
     {
     }
 

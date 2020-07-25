@@ -45,11 +45,24 @@ public class Patrol : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         bool lastDir = isRight;
 
         ViewCheck();
+
+        if (searching && !targetVisable)
+        {
+            if (GetComponentInChildren<StateIcons>()) GetComponentInChildren<StateIcons>().setSearch(true);
+        }
+        else if (following || targetVisable)
+        {
+            if (GetComponentInChildren<StateIcons>()) GetComponentInChildren<StateIcons>().setAlert(true);
+        }
+        else
+        {
+            if (GetComponentInChildren<StateIcons>()) GetComponentInChildren<StateIcons>().setAlert(false);
+        }
 
         switch (state)
         {
@@ -81,14 +94,17 @@ public class Patrol : MonoBehaviour
         {
             foreach (Collider2D collider in colliders)
             {
-                if (collider.CompareTag("Player"))
+                if (collider != null)
                 {
-                    targetVisable = GetComponentInChildren<FOV>().CheckObstruction(collider);
-                    if (targetVisable)
+                    if (collider.CompareTag("Player"))
                     {
-                        target = collider.ClosestPoint(transform.position);
-                        target.y = transform.position.y;
-                        return;
+                        targetVisable = GetComponentInChildren<FOV>().CheckObstruction(collider);
+                        if (targetVisable)
+                        {
+                            target = collider.ClosestPoint(transform.position);
+                            target.y = transform.position.y;
+                            return;
+                        }
                     }
                 }
             }
@@ -105,7 +121,6 @@ public class Patrol : MonoBehaviour
                     if (targetVisable)
                     {
                         animator.SetBool("Search", false);
-                        Debug.Log("Follow");
                         target = collider.ClosestPoint(transform.position);
                         target.y = transform.position.y;
                         following = true;
@@ -118,7 +133,7 @@ public class Patrol : MonoBehaviour
 
         if (following && !searching && !targetVisable)
         {
-            Debug.Log("Search");
+            Debug.Log("Lost Target");
             following = false;
             searching = true;
             searchLocationReached = false;
@@ -132,8 +147,20 @@ public class Patrol : MonoBehaviour
     {
         Vector2 direction = (target - (Vector2)transform.position).normalized;
 
-        if (Vector2.Distance(target, transform.position) < MinDistance - 0.1) direction = -direction;
+        
+
+        if (Vector2.Distance(target, transform.position) < MinDistance - 0.1)
+        {
+            direction = -direction;
+            Vector2 f = new Vector2(direction.x * speed, 0);
+            body.velocity = new Vector2(f.x, body.velocity.y);
+            animator.SetBool("Moving", true);
+            return;
+        }
         else if (Vector2.Distance(target, transform.position) < MinDistance || Vector2.Distance(target, transform.position) > MaxDistance) direction = Vector2.zero;
+
+        if (direction.x != 0) animator.SetBool("Moving", true);
+        else animator.SetBool("Moving", false);
 
         Vector2 force = new Vector2(direction.x * speed, 0);
 
@@ -144,12 +171,8 @@ public class Patrol : MonoBehaviour
         if (direction.x < 0) isRight = true;
         else if (direction.x > 0) isRight = false;
 
-        if(direction.x != 0) animator.SetBool("Moving", true);
-        else animator.SetBool("Moving", false);
-
         if (lastDir != isRight)
         {
-            Debug.Log("Flip Sprite");
             GetComponent<SpriteRenderer>().flipX = isRight;
             GameObject obj = GetComponentInChildren<FOV>().gameObject;
             obj.transform.RotateAround(gameObject.transform.position, Vector3.up, 180);
@@ -163,7 +186,6 @@ public class Patrol : MonoBehaviour
 
         if (Vector2.Distance(target, transform.position) < MinDistance && !searchLocationReached)
         {
-            Debug.Log("Destination Reached");
             animator.SetBool("Search", true);
             searchLocationReached = true;
             clock = 0;
@@ -175,8 +197,8 @@ public class Patrol : MonoBehaviour
             clock += Time.deltaTime;
             if (clock >= searchTime)
             {
-                Debug.Log("Stop Search");
                 animator.SetBool("Search", false);
+                searching = false;
                 state = State.Idle;
             }
         }
@@ -196,7 +218,6 @@ public class Patrol : MonoBehaviour
 
             if (lastDir != isRight)
             {
-                Debug.Log("Flip Sprite");
                 GetComponent<SpriteRenderer>().flipX = isRight;
                 GameObject obj = GetComponentInChildren<FOV>().gameObject;
                 obj.transform.RotateAround(gameObject.transform.position, Vector3.up, 180);
@@ -211,12 +232,10 @@ public class Patrol : MonoBehaviour
 
     void Wander()
     {
-
     }
 
     public void flip()
     {
-        Debug.Log("Flip");
         isRight = !isRight;
 
         GetComponent<SpriteRenderer>().flipX = isRight;
@@ -228,7 +247,6 @@ public class Patrol : MonoBehaviour
     {
         if (pause)
         {
-            Debug.Log("Pause Patrol");
             if (lastState != State.Pause)
             {
                 body.velocity = new Vector2(0, body.velocity.y);
@@ -239,7 +257,6 @@ public class Patrol : MonoBehaviour
         }
         else
         {
-            Debug.Log("UnPause Patrol");
             if (lastState != State.Pause)
             {
                 state = State.Search;

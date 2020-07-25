@@ -58,7 +58,6 @@ public class PlayerController : MonoBehaviour
 
         if (!crouched && IsGrounded() && !jumping && Input.GetButtonDown("Jump"))
         {
-            Debug.Log("Jump");
             PlayerBody.AddForce(new Vector2(0, JumpForce), ForceMode2D.Impulse);
             animator.SetBool("Jumping", true);
             jumping = true;

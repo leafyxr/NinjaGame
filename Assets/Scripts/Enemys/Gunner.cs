@@ -42,7 +42,6 @@ public class Gunner : MonoBehaviour
             {
                 if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.9)
                 {
-                    Debug.Log("Animation End");
                     animationEnd();
                 }
             }
@@ -96,5 +95,6 @@ public class Gunner : MonoBehaviour
     {
         GameObject projectile = Instantiate(bulletPrefab, Fireposition.position, Fireposition.rotation);
         projectile.GetComponent<Projectile>().setTarget(target);
+        projectile.GetComponent<Projectile>().setDamage(GetComponent<Enemy>().GetStats().RangedAttackDamage);
     }
 }
