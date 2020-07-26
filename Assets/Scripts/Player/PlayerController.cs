@@ -39,11 +39,14 @@ public class PlayerController : MonoBehaviour
 
     Animator animator;
 
+    
+
     // Start is called before the first frame update
     void Start()
     {
         PlayerBody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        
     }
 
     private void Update()
@@ -162,8 +165,12 @@ public class PlayerController : MonoBehaviour
         Vector2 direction = Vector2.down;
         float distance = 1.0f;
 
-        Debug.DrawRay(position, direction, Color.green);
+        //Debug.DrawRay(position, direction, Color.green);
         RaycastHit2D hit = Physics2D.Raycast(position, direction, distance, groundLayer);
+
+        if (hit) Debug.DrawRay(position, direction, Color.green);
+        else Debug.DrawRay(position, direction, Color.red);
+
         return hit;
     }
 

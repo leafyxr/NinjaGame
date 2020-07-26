@@ -35,19 +35,22 @@ public class Patrol : MonoBehaviour
     [SerializeField]
     float speed;
 
-    bool isRight = false;
+    bool isLeft = false;
+
+    GroundCheck groundCheck;
 
     // Start is called before the first frame update
     void Start()
     {
-        isRight = false;
+        isLeft = false;
         body = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        groundCheck = GetComponent<GroundCheck>();
     }
 
     private void FixedUpdate()
     {
-        bool lastDir = isRight;
+        bool lastDir = isLeft;
 
         ViewCheck();
 
@@ -147,15 +150,29 @@ public class Patrol : MonoBehaviour
     {
         Vector2 direction = (target - (Vector2)transform.position).normalized;
 
-        
+        if (!isLeft && !groundCheck.checkGroundR())
+        {
+            Debug.Log("Right Edge");
+            direction = Vector2.zero;
+        }
+        if (isLeft && !groundCheck.checkGroundL())
+        {
+            Debug.Log("Left Edge");
+            direction = Vector2.zero; 
+        }
 
         if (Vector2.Distance(target, transform.position) < MinDistance - 0.1)
         {
-            direction = -direction;
-            Vector2 f = new Vector2(direction.x * speed, 0);
-            body.velocity = new Vector2(f.x, body.velocity.y);
-            animator.SetBool("Moving", true);
-            return;
+            if (isLeft && !groundCheck.checkGroundR()) direction = Vector2.zero;
+            else if (!isLeft && !groundCheck.checkGroundL()) direction = Vector2.zero;
+            else
+            {
+                direction = -direction;
+                Vector2 f = new Vector2(direction.x * speed, 0);
+                body.velocity = new Vector2(f.x, body.velocity.y);
+                animator.SetBool("Moving", true);
+                return;
+            }
         }
         else if (Vector2.Distance(target, transform.position) < MinDistance || Vector2.Distance(target, transform.position) > MaxDistance) direction = Vector2.zero;
 
@@ -166,14 +183,14 @@ public class Patrol : MonoBehaviour
 
         body.velocity = new Vector2(force.x, body.velocity.y);
 
-        bool lastDir = isRight;
+        bool lastDir = isLeft;
 
-        if (direction.x < 0) isRight = true;
-        else if (direction.x > 0) isRight = false;
+        if (direction.x < 0) isLeft = true;
+        else if (direction.x > 0) isLeft = false;
 
-        if (lastDir != isRight)
+        if (lastDir != isLeft)
         {
-            GetComponent<SpriteRenderer>().flipX = isRight;
+            GetComponent<SpriteRenderer>().flipX = isLeft;
             GameObject obj = GetComponentInChildren<FOV>().gameObject;
             obj.transform.RotateAround(gameObject.transform.position, Vector3.up, 180);
         }
@@ -184,7 +201,9 @@ public class Patrol : MonoBehaviour
     {
         Vector2 direction = (target - (Vector2)transform.position).normalized;
 
-        if (Vector2.Distance(target, transform.position) < MinDistance && !searchLocationReached)
+        if ((!isLeft && !groundCheck.checkGroundR() && !searchLocationReached)
+            || (isLeft && !groundCheck.checkGroundL() && !searchLocationReached) 
+            || (Vector2.Distance(target, transform.position) < MinDistance && !searchLocationReached))
         {
             animator.SetBool("Search", true);
             searchLocationReached = true;
@@ -208,17 +227,17 @@ public class Patrol : MonoBehaviour
 
             body.velocity = new Vector2(force.x, body.velocity.y);
 
-            bool lastDir = isRight;
+            bool lastDir = isLeft;
 
-            if (direction.x < 0) isRight = true;
-            else if (direction.x > 0) isRight = false;
+            if (direction.x < 0) isLeft = true;
+            else if (direction.x > 0) isLeft = false;
 
             if (direction.x != 0) animator.SetBool("Moving", true);
             else animator.SetBool("Moving", false);
 
-            if (lastDir != isRight)
+            if (lastDir != isLeft)
             {
-                GetComponent<SpriteRenderer>().flipX = isRight;
+                GetComponent<SpriteRenderer>().flipX = isLeft;
                 GameObject obj = GetComponentInChildren<FOV>().gameObject;
                 obj.transform.RotateAround(gameObject.transform.position, Vector3.up, 180);
             }
@@ -236,9 +255,9 @@ public class Patrol : MonoBehaviour
 
     public void flip()
     {
-        isRight = !isRight;
+        isLeft = !isLeft;
 
-        GetComponent<SpriteRenderer>().flipX = isRight;
+        GetComponent<SpriteRenderer>().flipX = isLeft;
         GameObject obj = GetComponentInChildren<FOV>().gameObject;
         obj.transform.RotateAround(gameObject.transform.position, Vector3.up, 180);
     }
