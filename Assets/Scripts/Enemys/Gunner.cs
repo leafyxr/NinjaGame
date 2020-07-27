@@ -34,35 +34,38 @@ public class Gunner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-         ViewCheck();
-
-        if (isAttacking && targetVisible)
+        if (patrolComponent.getAlert())
         {
-            if (animator.GetCurrentAnimatorStateInfo(0).IsName("GunnerFire"))
+            ViewCheck();
+
+            if (isAttacking && targetVisible)
             {
-                if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.9)
+                if (animator.GetCurrentAnimatorStateInfo(0).IsName("GunnerFire"))
                 {
-                    animationEnd();
+                    if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.9)
+                    {
+                        animationEnd();
+                    }
+                }
+                clock += Time.deltaTime;
+                if (clock >= attackDelay)
+                {
+                    patrolComponent.pausePatrol(true);
+                    animator.SetTrigger("Attack");
+                    clock = 0.0f;
                 }
             }
-            clock += Time.deltaTime;
-            if (clock >= attackDelay)
+            else if (!isAttacking && targetVisible)
             {
-                patrolComponent.pausePatrol(true);
-                animator.SetTrigger("Attack");
+                clock += Time.deltaTime;
+                isAttacking = true;
+            }
+            else if (isAttacking && !targetVisible)
+            {
+                animationEnd();
+                isAttacking = false;
                 clock = 0.0f;
             }
-        }
-        else if (!isAttacking && targetVisible)
-        {
-            clock += Time.deltaTime;
-            isAttacking = true;
-        }
-        else if (isAttacking && !targetVisible)
-        {
-            animationEnd();
-            isAttacking = false;
-            clock = 0.0f;
         }
     }
 

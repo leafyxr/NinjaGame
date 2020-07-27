@@ -23,6 +23,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     float AirSpeed = 5.0f;
 
+   
+
     [SerializeField]
     float CrouchDrag;
 

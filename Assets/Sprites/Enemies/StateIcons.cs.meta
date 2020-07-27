@@ -4,9 +4,9 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - alertIcon: {fileID: -2686402704271477154, guid: 4ee9d8dd16d7ead4b8b75e9fb6ea9544,
+  - alertIcon: {fileID: -1581564813272465022, guid: b6edde332f6f21b4bbd953706fb60e0b,
       type: 3}
-  - searchIcon: {fileID: -543492317096339405, guid: 4ee9d8dd16d7ead4b8b75e9fb6ea9544,
+  - searchIcon: {fileID: -1390800967245228438, guid: b6edde332f6f21b4bbd953706fb60e0b,
       type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
