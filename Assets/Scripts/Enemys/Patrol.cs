@@ -51,6 +51,9 @@ public class Patrol : MonoBehaviour
 
     bool paused = false;
 
+    [SerializeField]
+    float alertRange = 5;
+
     GroundCheck groundCheck;
 
     // Start is called before the first frame update
@@ -167,6 +170,7 @@ public class Patrol : MonoBehaviour
                         animator.SetBool("Search", false);
                         target = collider.ClosestPoint(transform.position);
                         target.y = transform.position.y;
+                        searching = false;
                         if (!following)
                         {
                             alertTimer += Time.deltaTime;
@@ -178,7 +182,6 @@ public class Patrol : MonoBehaviour
                         }
                         else
                         {
-                            searching = false;
                             state = State.Follow;
                             return;
                         }
@@ -216,6 +219,13 @@ public class Patrol : MonoBehaviour
     // Update is called once per frame
     void Follow()
     {
+        Collider2D[] Colliders = Physics2D.OverlapCircleAll(transform.position, alertRange);
+        foreach(Collider2D collider in Colliders)
+        {
+            if (collider.GetComponent<Patrol>()) collider.GetComponent<Patrol>().alert(transform.position);
+        }
+
+
         Vector2 direction = (target - (Vector2)transform.position).normalized;
 
         if (!isLeft && !groundCheck.checkGroundR())
@@ -403,5 +413,23 @@ public class Patrol : MonoBehaviour
             }
         }
         return false;
+    }
+
+    public void alert(Vector2 newTarget)
+    {
+        if (!following)
+        {
+            Debug.Log("Alerted", gameObject);
+
+            target = newTarget;
+            clock = 0;
+
+            if (!searching)
+            {
+                searching = true;
+                searchLocationReached = false;
+                state = State.Search;
+            }
+        }
     }
 }

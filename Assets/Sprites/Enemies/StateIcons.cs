@@ -25,13 +25,13 @@ public class StateIcons : MonoBehaviour
     {
         spriteMask = GetComponent<SpriteMask>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        animator = GetComponent<Animator>();
+       // animator = GetComponent<Animator>();
     }
 
     public void setAlert(bool alert)
     {
-        animator.SetBool("Alert", alert);
-        animator.SetBool("Search", false);
+        //animator.SetBool("Alert", alert);
+       // animator.SetBool("Search", false);
         if (alert)
         {
             spriteRenderer.sprite = alertIcon;
@@ -52,8 +52,8 @@ public class StateIcons : MonoBehaviour
 
     public void setSearch(bool search)
     {
-        animator.SetBool("Search", search);
-        animator.SetBool("Alert", false);
+       // animator.SetBool("Search", search);
+        //animator.SetBool("Alert", false);
         if (search)
         {
             spriteRenderer.sprite = searchIcon;
@@ -74,8 +74,8 @@ public class StateIcons : MonoBehaviour
 
     public void alertTimer(float progress)
     {
-        animator.SetBool("Alert", true);
-        animator.SetBool("Search", false);
+       // animator.SetBool("Alert", true);
+        //animator.SetBool("Search", false);
         spriteRenderer.sprite = alertIcon;
         spriteMask.sprite = alertIcon;
 
@@ -85,8 +85,8 @@ public class StateIcons : MonoBehaviour
 
     public void searchTimer(float progress)
     {
-        animator.SetBool("Alert", false);
-        animator.SetBool("Search", true);
+       // animator.SetBool("Alert", false);
+       // animator.SetBool("Search", true);
         spriteRenderer.sprite = searchIcon;
         spriteMask.sprite = searchIcon;
 

@@ -27,7 +27,7 @@ public class Projectile : MonoBehaviour
     {
         Vector2 force = direction * speed;
 
-        body.velocity = new Vector2(force.x, body.velocity.y);
+        body.velocity = new Vector2(force.x, force.y);
 
         Collider2D[] hits = new Collider2D[1];
         int i = GetComponent<Collider2D>().GetContacts(ContactFilter, hits);
